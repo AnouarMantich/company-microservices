@@ -1,0 +1,39 @@
+services:
+  postgres:
+    container_name: postgres-db
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpassword
+      PGDATA: /data/postgres
+    volumes:
+      - jobs-volume:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+  zipkin:
+    container_name: zipkin
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - postgres
+  rabbtimq:
+    image: rabbitmq:3-management
+    container_name: rabbitmd
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - postgres
+
+
+networks:
+  postgres:
+    driver: bridge
+volumes:
+  jobs-volume:
+    external: true
